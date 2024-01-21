@@ -8,21 +8,62 @@
 #include "game/game.h"
 #include "resource_manager.h"
 
+#include "spdlog/spdlog.h"
+#include "yaml-cpp/emitter.h"
+#include "yaml-cpp/emittermanip.h"
+#include "yaml-cpp/node/node.h"
+#include "yaml-cpp/yaml.h"
+
+#include <cstring>
+#include <fstream>
+
 // GLFW function declerations
-void key_callback(GLFWwindow *window, int key, int scancode,
-				  int action, int mode);
+void keyCallback(GLFWwindow *window, int key, int scancode,
+				 int action, int mode);
 
-void framebuffer_size_callback(GLFWwindow *window, int width,
-							   int height);
+void framebufferSizeCallback(GLFWwindow *window, int width,
+							 int height);
 
-// The Width of the screen
-const GLuint SCREEN_WIDTH = 200;
-// The height of the screen
-const GLuint SCREEN_HEIGHT = 320;
+int WINDOW_WIDTH;
+int WINDOW_HEIGHT;
+std::string WINDOW_TITLE;
 
-GameProject game(SCREEN_WIDTH, SCREEN_HEIGHT);
+GameProject *game;
+
+YAML::Node config;
+
+void LoadConfig(const char *configFilename) {
+	std::ifstream configFile(configFilename);
+	config = YAML::Load(configFile);
+	if (!config["window"]["width"]) {
+		config["window"]["width"] = 800U;
+	}
+	if (!config["window"]["height"]) {
+		config["window"]["height"] = 600U;
+	}
+	if (!config["window"]["title"]) {
+		config["window"]["title"] = "Example";
+	}
+	WINDOW_WIDTH =
+		static_cast<int>(config["window"]["width"].as<unsigned>());
+	WINDOW_HEIGHT =
+		static_cast<int>(config["window"]["height"].as<unsigned>());
+	WINDOW_TITLE = config["window"]["title"].as<std::string>();
+}
+void DumpConfig(const char *configFilename) {
+	std::ofstream configFile(configFilename);
+	YAML::Emitter dumper;
+	dumper.SetIndent(4);
+	dumper.SetMapFormat(YAML::Block);
+	dumper << config;
+	configFile << dumper.c_str();
+}
 
 auto main(int argc, const char *argv[]) -> int {
+	LoadConfig(argc > 2 && strcmp(argv[1], "--config") == 0
+				   ? argv[2]
+				   : "config.yaml");
+	game = new GameProject(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -30,8 +71,9 @@ auto main(int argc, const char *argv[]) -> int {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow *window = glfwCreateWindow(
-		SCREEN_WIDTH, SCREEN_HEIGHT, "Test-4", nullptr, nullptr);
+	GLFWwindow *window =
+		glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT,
+						 WINDOW_TITLE.c_str(), nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(
@@ -39,16 +81,16 @@ auto main(int argc, const char *argv[]) -> int {
 		return -1;
 	}
 
-	glfwSetKeyCallback(window, key_callback);
+	glfwSetKeyCallback(window, keyCallback);
 
 	// OpenGL configuration
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Initialize game
-	game.Init();
+	game->Init();
 
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0F;
@@ -62,26 +104,30 @@ auto main(int argc, const char *argv[]) -> int {
 
 		// deltaTime = 0.001f;
 		// Manage user input
-		game.ProcessInput(deltaTime);
+		game->ProcessInput(deltaTime);
 
 		// Update Game state
-		game.Update(deltaTime);
+		game->Update(deltaTime);
 
 		// Render
 		glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
 		glClear(GL_COLOR_BUFFER_BIT);
-		game.Render();
+		game->Render();
 
 		glfwSwapBuffers(window);
 	}
-	game.CleanUp();
+	game->CleanUp();
+
+	DumpConfig(argc > 2 && strcmp(argv[1], "--config") == 0
+				   ? argv[2]
+				   : "config.yaml");
 
 	glfwTerminate();
 	return 0;
 }
 
-void key_callback(GLFWwindow *window, int key, int scancode,
-				  int action, int mode) {
+void keyCallback(GLFWwindow *window, int key, int scancode,
+				 int action, int mode) {
 	// When a user presses the escape key, we set the
 	// WindowShouldClose property to true, closing the application
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -89,16 +135,16 @@ void key_callback(GLFWwindow *window, int key, int scancode,
 	}
 	if (key >= 0 && key < 1024) {
 		if (action == GLFW_PRESS) {
-			game.GetAdapter().SetKeyPress(key);
+			game->GetAdapter().SetKeyPress(key);
 		}
 		else if (action == GLFW_RELEASE) {
-			game.GetAdapter().SetKeyUnPress(key);
+			game->GetAdapter().SetKeyUnPress(key);
 		}
 	}
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width,
-							   int height) {
+void framebufferSizeCallback(GLFWwindow *window, int width,
+							 int height) {
 	// make sure the viewport matches the new window dimensions; note
 	// that width and height will be significantly larger than
 	// specified on retina displays.

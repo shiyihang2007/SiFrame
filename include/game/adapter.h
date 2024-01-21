@@ -8,37 +8,26 @@
 #include "sprite_renderer.h"
 
 class Adapter {
-	bool Keys[1024];
+  private:
+	int width, height;
+	bool keys[1024];
 	SpriteRenderer *renderer;
 
   public:
 	~Adapter() { delete renderer; }
 
-	void Init(int Width, int Height) {
-		// load shaders
-		ResourceManager::LoadShader("./shader/sprite.vert",
-									"./shader/sprite.frag", nullptr,
-									"sprite");
-		// configure shaders
-		glm::mat4 projection = glm::ortho(
-			0.0F, static_cast<float>(Width),
-			static_cast<float>(Height), 0.0f, -1.0f, 1.0f);
-		ResourceManager::GetShader("sprite").Use().SetInteger(
-			"image", 0);
-		ResourceManager::GetShader("sprite").SetMatrix4("projection",
-														projection);
-		// set render-specific controls
-		renderer =
-			new SpriteRenderer(ResourceManager::GetShader("sprite"));
-	}
+	void Init(int Width, int Height);
 
-	void SetKeyPress(int key) { Keys[key] = true; }
-	void SetKeyUnPress(int key) { Keys[key] = false; }
+	void SetKeyPress(int key) { keys[key] = true; }
+	void SetKeyUnPress(int key) { keys[key] = false; }
 	[[nodiscard]] auto GetKeyState(int key) const -> bool {
-		return Keys[key];
+		return keys[key];
 	}
 
-	auto GetSpriteRenderer() -> SpriteRenderer * { return renderer; }
+	void Draw(const char *spriteId, float posx, float posy,
+			  float width, float height, float rotation = 0.0F,
+			  float colorR = 1.0F, float colorG = 1.0F,
+			  float colorB = 1.0F);
 };
 
 #endif

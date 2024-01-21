@@ -34,7 +34,7 @@
 # CMake Build
 .cache/
 build/
-SpaceCombat*
+Example*
 
 # CMake
 CMakeLists.txt.user

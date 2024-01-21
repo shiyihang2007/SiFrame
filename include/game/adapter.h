@@ -28,6 +28,9 @@ class Adapter {
 			  float width, float height, float rotation = 0.0F,
 			  float colorR = 1.0F, float colorG = 1.0F,
 			  float colorB = 1.0F);
+
+	void LoadTexture(const char *textureId, bool alpha,
+					 const char *filePath);
 };
 
 #endif

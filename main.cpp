@@ -53,7 +53,7 @@ void LoadConfig(const char *configFilename) {
 void DumpConfig(const char *configFilename) {
 	std::ofstream configFile(configFilename);
 	YAML::Emitter dumper;
-	dumper.SetIndent(4);
+	dumper.SetIndent(2);
 	dumper.SetMapFormat(YAML::Block);
 	dumper << config;
 	configFile << dumper.c_str();

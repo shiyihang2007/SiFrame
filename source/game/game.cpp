@@ -1,9 +1,32 @@
 #include "game/game.h"
 #include "game/adapter.h"
+#include "game/gameObject.h"
 #include "resource_manager.h"
+
+#include "spdlog/spdlog.h"
+#include "yaml-cpp/yaml.h"
+
+#include <string>
+#include <utility>
+#include <vector>
+
+extern YAML::Node config;
 
 void GameProject::Init() {
 	this->adapter.Init(this->width, this->height);
+
+	YAML::Node textures = config["textures"];
+	for (auto &&texture : textures) {
+		ResourceManager::LoadTexture(
+			texture["id"].as<std::string>().c_str(),
+			texture["alpha"] ? texture["alpha"].as<bool>() : false,
+			texture["path"]
+				? texture["path"].as<std::string>()
+				: "./texture/" + texture["id"].as<std::string>() +
+					  ".png");
+	}
+
+	this->changeState("MainMenu");
 }
 
 void GameProject::ProcessInput(float dt) {}
@@ -23,4 +46,47 @@ void GameProject::Render() {
 void GameProject::CleanUp() {
 	// Delete all resources as loaded using the resource manager
 	ResourceManager::Clear();
+}
+
+auto createNewGameObject(YAML::Node object) -> GameObject * {
+	GameObject *gameObject;
+	if (!object["type"] ||
+		object["type"].as<std::string>() == "gameObject") {
+		gameObject = new GameObject;
+	}
+
+	spdlog::info("spriteId:{} position:({},{})",
+				 object["spriteId"].as<std::string>(),
+				 object["width"].as<float>(),
+				 object["height"].as<float>());
+
+	gameObject->SetSpriteId(
+		object["spriteId"] ? object["spriteId"].as<std::string>()
+						   : "unknown");
+	gameObject->SetPosition(
+		object["posx"] ? object["posx"].as<float>() : 0.0F,
+		object["posy"] ? object["posy"].as<float>() : 0.0F);
+	gameObject->SetSize(
+		object["width"] ? object["width"].as<float>() : 10.0F,
+		object["height"] ? object["height"].as<float>() : 10.0F);
+	gameObject->SetRotation(
+		object["rotation"] ? object["rotation"].as<float>() : 0.0F);
+	gameObject->SetColor(
+		object["colorR"] ? object["colorR"].as<float>() : 1.0F,
+		object["colorG"] ? object["colorG"].as<float>() : 1.0F,
+		object["colorB"] ? object["colorB"].as<float>() : 1.0F);
+	return gameObject;
+}
+void GameProject::changeState(GameState newState) {
+	this->gameState = std::move(newState);
+	for (auto [key, gameObject] : this->gameObjects) {
+		delete gameObject;
+	}
+	this->gameObjects.clear();
+
+	YAML::Node stateInfo = config["states"][this->gameState];
+	for (auto &&object : stateInfo) {
+		this->gameObjects[object["name"].as<std::string>()] =
+			createNewGameObject(object);
+	}
 }

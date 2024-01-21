@@ -7,12 +7,17 @@
 
 #include "game/adapter.h"
 #include "game/gameObject.h"
+#include "game/gameState.h"
 
 class GameProject {
 	int width, height;
 
 	Adapter adapter;
 	std::map<std::string, GameObject *> gameObjects;
+
+	GameState gameState;
+
+	void changeState(GameState newState);
 
   public:
 	GameProject(int width, int height)

@@ -1,4 +1,13 @@
 window:
-    width: 800
-    height: 600
-    title: Example
+  width: 800
+  height: 600
+  title: Example
+textures:
+  - id: background
+    path: ./texture/background.png
+states:
+  MainMenu:
+    - name: background
+      spriteId: background
+      width: 100
+      height: 100

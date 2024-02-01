@@ -1,13 +1,22 @@
+debug:
+  loglevel: debug
 window:
-  width: 800
-  height: 600
+  width: 512
+  height: 512
   title: Example
 textures:
-  - id: background
+  - id: unknown
+    path: ./texture/unknown.png
+    alpha: true
+  - id: BackgroundSprite
     path: ./texture/background.png
+    alpha: true
 states:
   MainMenu:
     - name: background
-      spriteId: background
+      spriteId: BackgroundSprite
       width: 100
       height: 100
+    - name: unknown
+      width: 6.25
+      height: 6.25

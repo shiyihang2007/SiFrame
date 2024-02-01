@@ -5,6 +5,16 @@
 
 #include "game/adapter.h"
 
+#include "yaml-cpp/yaml.h"
+
+#define GAME_OBJECT_SET_MEMBER(member, nodeName, defaultValue)      \
+	member = object[#member]                                        \
+				 ? object[nodeName].as<decltype(member)>()          \
+				 : defaultValue
+#define GAME_OBJECT_SET_MEMBER_DEFAULT(member, defaultValue)        \
+	member = object[#member]                                        \
+				 ? object[#member].as<decltype(member)>()           \
+				 : defaultValue
 class GameObject {
   protected:
 	std::string spriteId;
@@ -24,26 +34,10 @@ class GameObject {
 		  colorR(colorR), colorG(colorG), colorB(colorB) {}
 	virtual ~GameObject() = default;
 
-	void SetSpriteId(std::string spriteId) {
-		this->spriteId = std::move(spriteId);
-	}
-	void SetPosition(float posx, float posy) {
-		this->posx = posx;
-		this->posy = posy;
-	}
-	void SetSize(float width, float height) {
-		this->width = width;
-		this->height = height;
-	}
-	void SetRotation(float rotation) { this->rotation = rotation; }
-	void SetColor(float colorR, float colorG, float colorB) {
-		this->colorR = colorR;
-		this->colorG = colorG;
-		this->colorB = colorB;
-	}
+	virtual void SetObjectByYaml(const YAML::Node &object);
 
 	virtual void Update(float dt);
-	virtual void Render(Adapter &adapter);
+	virtual void Render(Adapter *adapter);
 };
 
 #endif

@@ -35,6 +35,9 @@ YAML::Node config;
 void LoadConfig(const char *configFilename) {
 	std::ifstream configFile(configFilename);
 	config = YAML::Load(configFile);
+	if (!config["debug"]["loglevel"]) {
+		config["debug"]["loglevel"] = "info";
+	}
 	if (!config["window"]["width"]) {
 		config["window"]["width"] = 800U;
 	}
@@ -49,6 +52,8 @@ void LoadConfig(const char *configFilename) {
 	WINDOW_HEIGHT =
 		static_cast<int>(config["window"]["height"].as<unsigned>());
 	WINDOW_TITLE = config["window"]["title"].as<std::string>();
+	spdlog::set_level(spdlog::level::from_str(
+		config["debug"]["loglevel"].as<std::string>()));
 }
 void DumpConfig(const char *configFilename) {
 	std::ofstream configFile(configFilename);
@@ -64,6 +69,7 @@ auto main(int argc, const char *argv[]) -> int {
 				   ? argv[2]
 				   : "config.yaml");
 	game = new GameProject(WINDOW_WIDTH, WINDOW_HEIGHT);
+	spdlog::info("Preload done.");
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -91,6 +97,7 @@ auto main(int argc, const char *argv[]) -> int {
 
 	// Initialize game
 	game->Init();
+	spdlog::info("Game init done.");
 
 	// DeltaTime variables
 	GLfloat deltaTime = 0.0F;
@@ -105,9 +112,11 @@ auto main(int argc, const char *argv[]) -> int {
 		// deltaTime = 0.001f;
 		// Manage user input
 		game->ProcessInput(deltaTime);
+		// spdlog::debug("Input done.");
 
 		// Update Game state
 		game->Update(deltaTime);
+		// spdlog::debug("Update done.");
 
 		// Render
 		glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
@@ -115,6 +124,7 @@ auto main(int argc, const char *argv[]) -> int {
 		game->Render();
 
 		glfwSwapBuffers(window);
+		// spdlog::debug("Render done.");
 	}
 	game->CleanUp();
 

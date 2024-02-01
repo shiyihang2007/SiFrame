@@ -1,15 +1,6 @@
-#include "game/gameObject.h"
-#include "game/adapter.h"
+#include "game/staticObject.h"
 
-void GameObject::Update(float dt) {}
-
-void GameObject::Render(Adapter *adapter) {
-	adapter->Draw(spriteId.c_str(), this->posx, this->posy,
-				  this->width, this->height, this->rotation,
-				  this->colorR, this->colorG, this->colorB);
-}
-
-void GameObject::SetObjectByYaml(const YAML::Node &object) {
+void StaticObject::SetObjectByYaml(const YAML::Node &object) {
 	GAME_OBJECT_SET_MEMBER_DEFAULT(spriteId, "unknown");
 	GAME_OBJECT_SET_MEMBER_DEFAULT(posx, 0.0F);
 	GAME_OBJECT_SET_MEMBER_DEFAULT(posy, 0.0F);

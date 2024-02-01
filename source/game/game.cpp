@@ -13,20 +13,30 @@
 extern YAML::Node config;
 
 void GameProject::Init() {
+	spdlog::info("Initializing game");
 	this->adapter.Init(this->width, this->height);
 
+	spdlog::info("Loading Texture...");
 	YAML::Node textures = config["textures"];
 	for (auto &&texture : textures) {
 		ResourceManager::LoadTexture(
-			texture["id"].as<std::string>().c_str(),
+			(texture["path"]
+				 ? texture["path"].as<std::string>()
+				 : "./texture/" + texture["id"].as<std::string>() +
+					   ".png")
+				.c_str(),
 			texture["alpha"] ? texture["alpha"].as<bool>() : false,
-			texture["path"]
-				? texture["path"].as<std::string>()
-				: "./texture/" + texture["id"].as<std::string>() +
-					  ".png");
+			texture["id"].as<std::string>());
+		spdlog::debug("Loaded texture from file {} as {} (alpha:{})",
+					  texture["path"].as<std::string>(),
+					  texture["id"].as<std::string>(),
+					  texture["alpha"] ? texture["alpha"].as<bool>()
+									   : false);
 	}
 
+	spdlog::info("Loading Objects...");
 	this->changeState("MainMenu");
+	spdlog::info("Game Inited.");
 }
 
 void GameProject::ProcessInput(float dt) {}
@@ -39,7 +49,7 @@ void GameProject::Update(float dt) {
 
 void GameProject::Render() {
 	for (auto [key, gameObject] : this->gameObjects) {
-		gameObject->Render(this->adapter);
+		gameObject->Render(&this->adapter);
 	}
 }
 
@@ -55,26 +65,21 @@ auto createNewGameObject(YAML::Node object) -> GameObject * {
 		gameObject = new GameObject;
 	}
 
-	spdlog::info("spriteId:{} position:({},{})",
-				 object["spriteId"].as<std::string>(),
-				 object["width"].as<float>(),
-				 object["height"].as<float>());
-
-	gameObject->SetSpriteId(
+	spdlog::debug(
+		"createObject: (spriteId:{}, position:({},{}), "
+		"size:({},{}), rotation:{}, color:({},{},{}))",
 		object["spriteId"] ? object["spriteId"].as<std::string>()
-						   : "unknown");
-	gameObject->SetPosition(
+						   : "unknown",
 		object["posx"] ? object["posx"].as<float>() : 0.0F,
-		object["posy"] ? object["posy"].as<float>() : 0.0F);
-	gameObject->SetSize(
+		object["posy"] ? object["posy"].as<float>() : 0.0F,
 		object["width"] ? object["width"].as<float>() : 10.0F,
-		object["height"] ? object["height"].as<float>() : 10.0F);
-	gameObject->SetRotation(
-		object["rotation"] ? object["rotation"].as<float>() : 0.0F);
-	gameObject->SetColor(
+		object["height"] ? object["height"].as<float>() : 10.0F,
+		object["rotation"] ? object["rotation"].as<float>() : 0.0F,
 		object["colorR"] ? object["colorR"].as<float>() : 1.0F,
 		object["colorG"] ? object["colorG"].as<float>() : 1.0F,
 		object["colorB"] ? object["colorB"].as<float>() : 1.0F);
+
+	gameObject->SetObjectByYaml(object);
 	return gameObject;
 }
 void GameProject::changeState(GameState newState) {
@@ -88,5 +93,7 @@ void GameProject::changeState(GameState newState) {
 	for (auto &&object : stateInfo) {
 		this->gameObjects[object["name"].as<std::string>()] =
 			createNewGameObject(object);
+		spdlog::debug("Loaded object '{}'",
+					  object["name"].as<std::string>());
 	}
 }

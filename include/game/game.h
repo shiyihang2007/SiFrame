@@ -3,7 +3,9 @@
 #define GAME_H
 
 #include <map>
+#include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "game/adapter.h"
@@ -11,12 +13,14 @@
 #include "game/gameBase.h"
 #include "game/gameObject.h"
 #include "game/gameState.h"
+#include "game/staticObject.h"
 
 class GameProject : public GameBase {
 	int width, height;
 
 	Adapter adapter;
 	std::map<std::string, GameObject *> gameObjects;
+	std::multimap<double, std::string, std::greater<>> zIndexQueue;
 	std::map<std::string, Event *> events;
 
 	GameState gameState;

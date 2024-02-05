@@ -18,6 +18,7 @@ states:
         spriteId: BackgroundSprite
         width: 800
         height: 600
+        zindex: -100
         type: gameObject
       - name: playButton
         posx: 300
@@ -32,6 +33,13 @@ states:
         spriteId: BackgroundSprite
         width: 800
         height: 600
+        zindex: -100
+        type: gameObject
+      - name: player1
+        posx: 400
+        posy: 300
+        width: 20
+        height: 20
         type: gameObject
       - name: exitButton
         posx: 100
@@ -40,3 +48,12 @@ states:
         height: 20
         type: staticObject
         onClickEvent: switchStateToMainMenu
+    keyMap:
+      - key: up
+        action: player1MoveUp
+      - key: down
+        action: player1MoveDown
+      - key: left
+        action: player1MoveLeft
+      - key: right
+        action: player1MoveRight

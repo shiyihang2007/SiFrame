@@ -1,5 +1,4 @@
 #include "game/gameObject.h"
-#include "game/adapter.h"
 #include "game/event.h"
 
 void GameObject::Update(float dt) {}
@@ -11,7 +10,7 @@ void GameObject::Render(Adapter *adapter) {
 }
 
 void GameObject::SetObjectByYaml(const YAML::Node &object) {
-	this->name = object.Tag();
+	GAME_OBJECT_SET_MEMBER_DEFAULT(name, "unknown");
 	GAME_OBJECT_SET_MEMBER_DEFAULT(spriteId, "unknown");
 	GAME_OBJECT_SET_MEMBER_DEFAULT(posx, 0.0F);
 	GAME_OBJECT_SET_MEMBER_DEFAULT(posy, 0.0F);
@@ -34,11 +33,11 @@ void GameObject::InsertObjectEvents(void *eventsV) {
 		new Event(this, [](GameObject *self, GameBase *game) {
 			self->posx += 10.0F;
 		});
-	(*events)[this->name + "MoveTop"] =
+	(*events)[this->name + "MoveUp"] =
 		new Event(this, [](GameObject *self, GameBase *game) {
 			self->posy -= 10.0F;
 		});
-	(*events)[this->name + "MoveButtom"] =
+	(*events)[this->name + "MoveDown"] =
 		new Event(this, [](GameObject *self, GameBase *game) {
 			self->posy += 10.0F;
 		});

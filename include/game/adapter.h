@@ -2,8 +2,15 @@
 #ifndef ADAPTER_H
 #define ADAPTER_H
 
+// clang-format off
+#define GLEW_STATIC
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+// clang-format on
+
 #include <cstring>
 #include <list>
+#include <map>
 #include <queue>
 #include <tuple>
 #include <utility>
@@ -17,6 +24,9 @@ class Adapter {
 	int width, height;
 	bool keys[1024];
 	bool buttons[1024];
+
+	std::map<std::string, int> keyStringMap;
+
 	SpriteRenderer *renderer;
 	using EventType =
 		std::tuple<int, bool, std::pair<double, double>>;
@@ -51,6 +61,19 @@ class Adapter {
 		auto tmp = mouseEvents.front();
 		mouseEvents.pop();
 		return tmp;
+	}
+
+	auto GetKeyName(int keyCode) -> std::string {
+		for (auto &&key : keyStringMap) {
+			if (key.second == keyCode) {
+				return key.first;
+			}
+		}
+		return "Unknown";
+	}
+	[[nodiscard]] auto GetKeyCode(const std::string &keyName)
+		-> int {
+		return keyStringMap[keyName];
 	}
 
 	void Draw(const char *spriteId, float posx, float posy,

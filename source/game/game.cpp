@@ -1,10 +1,10 @@
 #include "game/game.h"
-#include "game/staticObject.h"
 #include "resource_manager.h"
 
 #include "spdlog/spdlog.h"
 #include "yaml-cpp/yaml.h"
 
+#include <ranges>
 #include <string>
 #include <utility>
 #include <vector>
@@ -42,10 +42,11 @@ void GameProject::Init() {
 }
 
 void GameProject::ProcessInput(float dt) {
-	// TODO(shiyihang): 将按键编号转为字符串存储
 	for (int i = 0; i < 1024; ++i) {
 		if (this->adapter.GetKeyState(i)) {
-			this->events[this->keyMap[i]]->Process(this);
+			this->events[!this->keyMap.contains(i) ? "none"
+												   : this->keyMap[i]]
+				->Process(this);
 		}
 	}
 	for (auto event = this->adapter.GetNextMouseEvent();
@@ -53,7 +54,8 @@ void GameProject::ProcessInput(float dt) {
 		 event = this->adapter.GetNextMouseEvent()) {
 		auto [key, state, pos] = event;
 		auto [x, y] = pos;
-		for (auto [key, gameObject] : this->gameObjects) {
+		for (auto [zindex, key] : this->zIndexQueue) {
+			auto *gameObject = this->gameObjects[key];
 			if (x >= gameObject->GetPosX() &&
 				x < gameObject->GetPosX() + gameObject->GetWidth() &&
 				y >= gameObject->GetPosY() &&
@@ -77,8 +79,9 @@ void GameProject::Update(float dt) {
 }
 
 void GameProject::Render() {
-	for (auto [key, gameObject] : this->gameObjects) {
-		gameObject->Render(&this->adapter);
+	for (auto &[zindex, key] :
+		 std::ranges::reverse_view(this->zIndexQueue)) {
+		this->gameObjects[key]->Render(&this->adapter);
 	}
 }
 
@@ -111,6 +114,7 @@ void GameProject::ChangeState(GameState newState) {
 		delete gameObject;
 	}
 	this->gameObjects.clear();
+	this->zIndexQueue.clear();
 
 	YAML::Node stateInfo = config["states"][this->gameState];
 	for (auto &&object : stateInfo["objects"]) {
@@ -124,15 +128,19 @@ void GameProject::ChangeState(GameState newState) {
 			createNewGameObject(object);
 		this->gameObjects[object["name"].as<std::string>()]
 			->InsertObjectEvents(&this->events);
+		this->zIndexQueue.emplace(
+			object["zindex"] ? object["zindex"].as<double>() : 0,
+			object["name"].as<std::string>());
 		spdlog::debug("Loaded object '{}'",
 					  object["name"].as<std::string>());
 	}
-	// TODO(shiyihang): 将按键编号转为字符串存储
-	for (int i = 0; i < 1024; ++i) {
-		this->keyMap[i] =
-			stateInfo["keymap"][i]
-				? stateInfo["keymap"][i].as<std::string>()
-				: "none";
+
+	this->keyMap.clear();
+	for (auto &&keyBind : stateInfo["keyMap"]) {
+		this->keyMap[this->adapter.GetKeyCode(
+			keyBind["key"].as<std::string>())] =
+			keyBind["action"].as<std::string>();
 	}
+
 	spdlog::info("State change done.");
 }

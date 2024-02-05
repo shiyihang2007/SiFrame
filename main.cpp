@@ -1,11 +1,4 @@
 
-// clang-format off
-#include "game/adapter.h"
-#define GLEW_STATIC
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-// clang-format on
-
 #include "game/game.h"
 #include "resource_manager.h"
 

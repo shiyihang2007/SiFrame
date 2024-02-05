@@ -1,5 +1,6 @@
 
 // clang-format off
+#include "game/adapter.h"
 #define GLEW_STATIC
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -20,6 +21,8 @@
 // GLFW function declerations
 void keyCallback(GLFWwindow *window, int key, int scancode,
 				 int action, int mode);
+void mouseButtonCallback(GLFWwindow *window, int button, int action,
+						 int mode);
 
 void framebufferSizeCallback(GLFWwindow *window, int width,
 							 int height);
@@ -82,18 +85,23 @@ auto main(int argc, const char *argv[]) -> int {
 						 WINDOW_TITLE.c_str(), nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
+	spdlog::info("Window Creation done.");
+
 	if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(
 			glfwGetProcAddress)) == 0) {
 		return -1;
 	}
 
 	glfwSetKeyCallback(window, keyCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 
 	// OpenGL configuration
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	spdlog::info("OpenGL config done.");
 
 	// Initialize game
 	game->Init();
@@ -145,10 +153,28 @@ void keyCallback(GLFWwindow *window, int key, int scancode,
 	}
 	if (key >= 0 && key < 1024) {
 		if (action == GLFW_PRESS) {
-			game->GetAdapter().SetKeyPress(key);
+			reinterpret_cast<Adapter *>(game->GetAdapter())
+				->SetKeyPress(key);
 		}
 		else if (action == GLFW_RELEASE) {
-			game->GetAdapter().SetKeyUnPress(key);
+			reinterpret_cast<Adapter *>(game->GetAdapter())
+				->SetKeyUnPress(key);
+		}
+	}
+}
+void mouseButtonCallback(GLFWwindow *window, int button, int action,
+						 int mode) {
+	double x;
+	double y;
+	glfwGetCursorPos(window, &x, &y);
+	if (button >= 0 && button < 1024) {
+		if (action == GLFW_PRESS) {
+			reinterpret_cast<Adapter *>(game->GetAdapter())
+				->SetMouseButtonPress(button, x, y);
+		}
+		else if (action == GLFW_RELEASE) {
+			reinterpret_cast<Adapter *>(game->GetAdapter())
+				->SetMouseButtonUnPress(button, x, y);
 		}
 	}
 }

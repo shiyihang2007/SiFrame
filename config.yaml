@@ -1,8 +1,8 @@
 debug:
   loglevel: debug
 window:
-  width: 512
-  height: 512
+  width: 800
+  height: 600
   title: Example
 textures:
   - id: unknown
@@ -13,10 +13,30 @@ textures:
     alpha: true
 states:
   MainMenu:
-    - name: background
-      spriteId: BackgroundSprite
-      width: 100
-      height: 100
-    - name: unknown
-      width: 6.25
-      height: 6.25
+    objects:
+      - name: background
+        spriteId: BackgroundSprite
+        width: 800
+        height: 600
+        type: gameObject
+      - name: playButton
+        posx: 300
+        posy: 290
+        width: 200
+        height: 20
+        type: staticObject
+        onClickEvent: switchStateToGamePlay
+  GamePlay:
+    objects:
+      - name: background
+        spriteId: BackgroundSprite
+        width: 800
+        height: 600
+        type: gameObject
+      - name: exitButton
+        posx: 100
+        posy: 100
+        width: 20
+        height: 20
+        type: staticObject
+        onClickEvent: switchStateToMainMenu

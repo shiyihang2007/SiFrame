@@ -10,4 +10,5 @@ void StaticObject::SetObjectByYaml(const YAML::Node &object) {
 	GAME_OBJECT_SET_MEMBER_DEFAULT(colorR, 1.0F);
 	GAME_OBJECT_SET_MEMBER_DEFAULT(colorG, 1.0F);
 	GAME_OBJECT_SET_MEMBER_DEFAULT(colorB, 1.0F);
+	GAME_OBJECT_SET_MEMBER_DEFAULT(onClickEvent, "none");
 }

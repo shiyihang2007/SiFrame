@@ -28,19 +28,16 @@ void Adapter::Draw(const char *spriteId, float posx, float posy,
 				   float width, float height, float rotation,
 				   float colorR, float colorG, float colorB) {
 	constexpr float SCALE = 0.01F;
-	renderer->DrawSprite(
-		ResourceManager::GetTexture(spriteId),
-		{posx * SCALE * static_cast<float>(this->width),
-		 posy * SCALE * static_cast<float>(this->height)},
-		{width * SCALE * static_cast<float>(this->width),
-		 height * SCALE * static_cast<float>(this->height)},
-		rotation, {colorR, colorG, colorB});
+	renderer->DrawSprite(ResourceManager::GetTexture(spriteId),
+						 {posx, posy}, {width, height}, rotation,
+						 {colorR, colorG, colorB});
 
 	// spdlog::debug("draw sprite: {}, pos: ({}, {}), size: ({}, {}),
-	// " 			  "rotation: {}, color: ({}, {}, {})", 			  spriteId, 			  posx * SCALE
+	// " 			  "rotation: {}, color: ({}, {}, {})", 			  spriteId,
+	// posx * SCALE
 	// * static_cast<float>(this->width), 			  posy * SCALE *
 	// static_cast<float>(this->height), 			  width * SCALE *
-	// static_cast<float>(this->width), 			  height * SCALE *
-	// static_cast<float>(this->height), 			  rotation, colorR, colorG,
-	// colorB);
+	// static_cast<float>(this->width), 			  height * SCALE
+	// * static_cast<float>(this->height), 			  rotation,
+	// colorR, colorG, colorB);
 }

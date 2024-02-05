@@ -4,20 +4,26 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "game/adapter.h"
+#include "game/event.h"
+#include "game/gameBase.h"
 #include "game/gameObject.h"
 #include "game/gameState.h"
 
-class GameProject {
+class GameProject : public GameBase {
 	int width, height;
 
 	Adapter adapter;
 	std::map<std::string, GameObject *> gameObjects;
+	std::map<std::string, Event *> events;
 
 	GameState gameState;
 
-	void changeState(GameState newState);
+	std::map<int, std::string> keyMap;
+
+	std::vector<std::string> eventList;
 
   public:
 	GameProject(int width, int height)
@@ -31,10 +37,14 @@ class GameProject {
 
 	void CleanUp();
 
-	auto GetAdapter() -> Adapter & { return adapter; }
-	[[nodiscard]] auto GetAdapter() const -> const Adapter & {
-		return adapter;
-	}
+	void ChangeState(GameState newState) override;
+
+	auto GetWidth() -> void * override { return &width; }
+	auto GetHeight() -> void * override { return &height; }
+	auto GetGameObjects() -> void * override { return &gameObjects; }
+	auto GetGameState() -> void * override { return &gameState; }
+	auto GetEvents() -> void * override { return &events; }
+	auto GetAdapter() -> void * override { return &adapter; }
 };
 
 #endif

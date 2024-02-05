@@ -1,6 +1,7 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
+#include <string>
 #include <utility>
 
 #include "game/adapter.h"
@@ -17,6 +18,7 @@
 				 : defaultValue
 class GameObject {
   protected:
+	std::string name;
 	std::string spriteId;
 	float posx, posy;
 	float width, height;
@@ -35,9 +37,32 @@ class GameObject {
 	virtual ~GameObject() = default;
 
 	virtual void SetObjectByYaml(const YAML::Node &object);
+	virtual void InsertObjectEvents(void *events);
+	virtual void RemoveObjectEvents(void *events);
 
 	virtual void Update(float dt);
 	virtual void Render(Adapter *adapter);
+
+	[[nodiscard]] virtual auto GetOnClickEvent() const
+		-> std::string {
+		return "none";
+	}
+
+	[[nodiscard]] auto GetPosX() const -> float {
+		return this->posx;
+	}
+	[[nodiscard]] auto GetPosY() const -> float {
+		return this->posy;
+	}
+	[[nodiscard]] auto GetWidth() const -> float {
+		return this->width;
+	}
+	[[nodiscard]] auto GetHeight() const -> float {
+		return this->height;
+	}
+	[[nodiscard]] auto GetRotation() const -> float {
+		return this->rotation;
+	}
 };
 
 #endif

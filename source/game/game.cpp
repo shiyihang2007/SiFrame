@@ -1,6 +1,5 @@
 #include "game/game.h"
-#include "game/adapter.h"
-#include "game/gameObject.h"
+#include "game/staticObject.h"
 #include "resource_manager.h"
 
 #include "spdlog/spdlog.h"
@@ -34,17 +33,47 @@ void GameProject::Init() {
 									   : false);
 	}
 
+	spdlog::info("Loading Events...");
+	InitEvents(&this->events);
+
 	spdlog::info("Loading Objects...");
-	this->changeState("MainMenu");
+	this->ChangeState("MainMenu");
 	spdlog::info("Game Inited.");
 }
 
-void GameProject::ProcessInput(float dt) {}
+void GameProject::ProcessInput(float dt) {
+	// TODO(shiyihang): 将按键编号转为字符串存储
+	for (int i = 0; i < 1024; ++i) {
+		if (this->adapter.GetKeyState(i)) {
+			this->events[this->keyMap[i]]->Process(this);
+		}
+	}
+	for (auto event = this->adapter.GetNextMouseEvent();
+		 std::get<0>(event) != -1;
+		 event = this->adapter.GetNextMouseEvent()) {
+		auto [key, state, pos] = event;
+		auto [x, y] = pos;
+		for (auto [key, gameObject] : this->gameObjects) {
+			if (x >= gameObject->GetPosX() &&
+				x < gameObject->GetPosX() + gameObject->GetWidth() &&
+				y >= gameObject->GetPosY() &&
+				y < gameObject->GetPosY() +
+						gameObject->GetHeight()) {
+				eventList.push_back(gameObject->GetOnClickEvent());
+				break;
+			}
+		}
+	}
+}
 
 void GameProject::Update(float dt) {
 	for (auto [key, gameObject] : this->gameObjects) {
 		gameObject->Update(dt);
 	}
+	for (const auto &event : this->eventList) {
+		this->events[event]->Process(this);
+	}
+	eventList.clear();
 }
 
 void GameProject::Render() {
@@ -58,42 +87,52 @@ void GameProject::CleanUp() {
 	ResourceManager::Clear();
 }
 
-auto createNewGameObject(YAML::Node object) -> GameObject * {
+auto createNewGameObject(YAML::Node &object) -> GameObject * {
 	GameObject *gameObject;
-	if (!object["type"] ||
-		object["type"].as<std::string>() == "gameObject") {
+	if (!object["type"]) {
+		object["type"] = "gameObject";
+	}
+	if (object["type"].as<std::string>() == "staticObject") {
+		gameObject = new StaticObject;
+	}
+	else {
 		gameObject = new GameObject;
 	}
-
-	spdlog::debug(
-		"createObject: (spriteId:{}, position:({},{}), "
-		"size:({},{}), rotation:{}, color:({},{},{}))",
-		object["spriteId"] ? object["spriteId"].as<std::string>()
-						   : "unknown",
-		object["posx"] ? object["posx"].as<float>() : 0.0F,
-		object["posy"] ? object["posy"].as<float>() : 0.0F,
-		object["width"] ? object["width"].as<float>() : 10.0F,
-		object["height"] ? object["height"].as<float>() : 10.0F,
-		object["rotation"] ? object["rotation"].as<float>() : 0.0F,
-		object["colorR"] ? object["colorR"].as<float>() : 1.0F,
-		object["colorG"] ? object["colorG"].as<float>() : 1.0F,
-		object["colorB"] ? object["colorB"].as<float>() : 1.0F);
 
 	gameObject->SetObjectByYaml(object);
 	return gameObject;
 }
-void GameProject::changeState(GameState newState) {
+void GameProject::ChangeState(GameState newState) {
+	spdlog::info("Changing state: {} -> {}", this->gameState,
+				 newState);
 	this->gameState = std::move(newState);
 	for (auto [key, gameObject] : this->gameObjects) {
+		gameObject->RemoveObjectEvents(&this->events);
 		delete gameObject;
 	}
 	this->gameObjects.clear();
 
 	YAML::Node stateInfo = config["states"][this->gameState];
-	for (auto &&object : stateInfo) {
+	for (auto &&object : stateInfo["objects"]) {
+		if (this->gameObjects.contains(
+				object["name"].as<std::string>())) {
+			spdlog::warn("Duplicate object name: {}; Skipping",
+						 object["name"].as<std::string>());
+			continue;
+		}
 		this->gameObjects[object["name"].as<std::string>()] =
 			createNewGameObject(object);
+		this->gameObjects[object["name"].as<std::string>()]
+			->InsertObjectEvents(&this->events);
 		spdlog::debug("Loaded object '{}'",
 					  object["name"].as<std::string>());
 	}
+	// TODO(shiyihang): 将按键编号转为字符串存储
+	for (int i = 0; i < 1024; ++i) {
+		this->keyMap[i] =
+			stateInfo["keymap"][i]
+				? stateInfo["keymap"][i].as<std::string>()
+				: "none";
+	}
+	spdlog::info("State change done.");
 }

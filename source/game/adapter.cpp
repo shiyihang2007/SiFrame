@@ -28,6 +28,12 @@ void Adapter::Init(int Width, int Height) {
 
 	// set key string
 	setKeyStrings(keyStringMap);
+
+	// clear keys
+	for (int i = 0; i < 1024; i++) {
+		keys[i] = false;
+		buttons[i] = false;
+	}
 }
 
 void Adapter::Draw(const char *spriteId, float posx, float posy,

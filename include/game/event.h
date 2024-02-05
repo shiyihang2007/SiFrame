@@ -9,16 +9,18 @@
 
 class Event {
 	GameObject *self;
-	void (*callback)(GameObject *self, GameBase *game);
+	void (*callback)(GameObject *self, GameBase *game,
+					 float deltaTime);
 
   public:
 	Event(GameObject *self,
-		  void (*callback)(GameObject *self, GameBase *game)) {
+		  void (*callback)(GameObject *self, GameBase *game,
+						   float deltaTime)) {
 		this->self = self;
 		this->callback = callback;
 	}
-	void Process(GameBase *game) {
-		this->callback(this->self, game);
+	void Process(GameBase *game, float deltaTime) {
+		this->callback(this->self, game, deltaTime);
 	}
 };
 

@@ -42,11 +42,9 @@ void GameProject::Init() {
 }
 
 void GameProject::ProcessInput(float dt) {
-	for (int i = 0; i < 1024; ++i) {
-		if (this->adapter.GetKeyState(i)) {
-			this->events[!this->keyMap.contains(i) ? "none"
-												   : this->keyMap[i]]
-				->Process(this);
+	for (auto [key, event] : keyMap) {
+		if (this->adapter.GetKeyState(key)) {
+			eventList.push_back(event);
 		}
 	}
 	for (auto event = this->adapter.GetNextMouseEvent();
@@ -69,11 +67,12 @@ void GameProject::ProcessInput(float dt) {
 }
 
 void GameProject::Update(float dt) {
+	// TODO(shiyihang): 添加物理实体
 	for (auto [key, gameObject] : this->gameObjects) {
 		gameObject->Update(dt);
 	}
 	for (const auto &event : this->eventList) {
-		this->events[event]->Process(this);
+		this->events[event]->Process(this, dt);
 	}
 	eventList.clear();
 }
@@ -95,6 +94,7 @@ auto createNewGameObject(YAML::Node &object) -> GameObject * {
 	if (!object["type"]) {
 		object["type"] = "gameObject";
 	}
+	// TODO(shiyihang): 添加名称至类型的映射
 	if (object["type"].as<std::string>() == "staticObject") {
 		gameObject = new StaticObject;
 	}
@@ -137,6 +137,18 @@ void GameProject::ChangeState(GameState newState) {
 
 	this->keyMap.clear();
 	for (auto &&keyBind : stateInfo["keyMap"]) {
+		if (this->adapter.GetKeyCode(
+				keyBind["key"].as<std::string>()) == -1) {
+			spdlog::warn("Invalid key: {}; Skipping",
+						 keyBind["key"].as<std::string>());
+			continue;
+		}
+		if (this->keyMap.contains(this->adapter.GetKeyCode(
+				keyBind["key"].as<std::string>()))) {
+			spdlog::warn("Duplicate key: {}; Skipping",
+						 keyBind["key"].as<std::string>());
+			continue;
+		}
 		this->keyMap[this->adapter.GetKeyCode(
 			keyBind["key"].as<std::string>())] =
 			keyBind["action"].as<std::string>();

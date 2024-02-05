@@ -73,7 +73,8 @@ class Adapter {
 	}
 	[[nodiscard]] auto GetKeyCode(const std::string &keyName)
 		-> int {
-		return keyStringMap[keyName];
+		return keyStringMap.contains(keyName) ? keyStringMap[keyName]
+											  : -1;
 	}
 
 	void Draw(const char *spriteId, float posx, float posy,

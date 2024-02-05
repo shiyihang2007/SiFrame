@@ -36,7 +36,25 @@ states:
         zindex: -100
         type: gameObject
       - name: player1
-        posx: 400
+        posx: 100
+        posy: 300
+        width: 20
+        height: 20
+        type: gameObject
+      - name: player2
+        posx: 300
+        posy: 300
+        width: 20
+        height: 20
+        type: gameObject
+      - name: player3
+        posx: 500
+        posy: 300
+        width: 20
+        height: 20
+        type: gameObject
+      - name: player4
+        posx: 700
         posy: 300
         width: 20
         height: 20
@@ -49,11 +67,35 @@ states:
         type: staticObject
         onClickEvent: switchStateToMainMenu
     keyMap:
-      - key: up
+      - key: w
         action: player1MoveUp
-      - key: down
+      - key: s
         action: player1MoveDown
-      - key: left
+      - key: a
         action: player1MoveLeft
-      - key: right
+      - key: d
         action: player1MoveRight
+      - key: up
+        action: player2MoveUp
+      - key: down
+        action: player2MoveDown
+      - key: left
+        action: player2MoveLeft
+      - key: right
+        action: player2MoveRight
+      - key: i
+        action: player3MoveUp
+      - key: k
+        action: player3MoveDown
+      - key: j
+        action: player3MoveLeft
+      - key: l
+        action: player3MoveRight
+      - key: num8
+        action: player4MoveUp
+      - key: num2
+        action: player4MoveDown
+      - key: num4
+        action: player4MoveLeft
+      - key: num6
+        action: player4MoveRight

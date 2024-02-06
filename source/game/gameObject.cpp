@@ -1,4 +1,5 @@
 #include "game/gameObject.h"
+#include "game/command.h"
 #include "game/event.h"
 
 #include "spdlog/spdlog.h"
@@ -30,29 +31,25 @@ void GameObject::SetObjectByYaml(const YAML::Node &object) {
 void GameObject::InsertObjectEvents(void *eventsV) {
 	auto *events =
 		reinterpret_cast<std::map<std::string, Event *> *>(eventsV);
-	(*events)[this->name + "MoveLeft"] = new Event(
-		this, [](GameObject *self, GameBase *game, float deltaTime) {
-			self->posx -= 1.0F * deltaTime;
-		});
-	(*events)[this->name + "MoveRight"] = new Event(
-		this, [](GameObject *self, GameBase *game, float deltaTime) {
-			self->posx += 1.0F * deltaTime;
-		});
-	(*events)[this->name + "MoveUp"] = new Event(
-		this, [](GameObject *self, GameBase *game, float deltaTime) {
-			self->posy -= 1.0F * deltaTime;
-		});
-	(*events)[this->name + "MoveDown"] = new Event(
-		this, [](GameObject *self, GameBase *game, float deltaTime) {
-			self->posy += 1.0F * deltaTime;
-		});
+	(*events)[this->name + "MoveLeft"] =
+		new Event(this, CommandMoveLeft::Instance());
+	(*events)[this->name + "MoveRight"] =
+		new Event(this, CommandMoveRight::Instance());
+	(*events)[this->name + "MoveUp"] =
+		new Event(this, CommandMoveUp::Instance());
+	(*events)[this->name + "MoveDown"] =
+		new Event(this, CommandMoveDown::Instance());
 }
 
 void GameObject::RemoveObjectEvents(void *eventsV) {
 	auto *events =
 		reinterpret_cast<std::map<std::string, Event *> *>(eventsV);
+	delete (*events)[this->name + "MoveLeft"];
 	events->erase(this->name + "MoveLeft");
+	delete (*events)[this->name + "MoveRight"];
 	events->erase(this->name + "MoveRight");
+	delete (*events)[this->name + "MoveUp"];
 	events->erase(this->name + "MoveTop");
+	delete (*events)[this->name + "MoveDown"];
 	events->erase(this->name + "MoveButtom");
 }

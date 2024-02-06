@@ -13,6 +13,7 @@
 #include "game/gameBase.h"
 #include "game/gameObject.h"
 #include "game/gameState.h"
+#include "game/physicsObject.h"
 #include "game/staticObject.h"
 
 class GameProject : public GameBase {

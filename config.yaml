@@ -40,13 +40,13 @@ states:
         posy: 300
         width: 20
         height: 20
-        type: gameObject
+        type: physicsObject
       - name: player2
         posx: 300
         posy: 300
         width: 20
         height: 20
-        type: gameObject
+        type: physicsObject
       - name: player3
         posx: 500
         posy: 300

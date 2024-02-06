@@ -1,4 +1,5 @@
 #include "game/game.h"
+#include "game/physicsObject.h"
 #include "resource_manager.h"
 
 #include "spdlog/spdlog.h"
@@ -67,9 +68,24 @@ void GameProject::ProcessInput(float dt) {
 }
 
 void GameProject::Update(float dt) {
-	// TODO(shiyihang): 添加物理实体
-	for (auto [key, gameObject] : this->gameObjects) {
-		gameObject->Update(dt);
+	for (auto &[zindex, key] :
+		 std::ranges::reverse_view(this->zIndexQueue)) {
+		this->gameObjects[key]->Update(dt);
+	}
+	// TODO(shiyihang): Optimize, Do not check the same object again
+	for (auto gameObjectX = this->gameObjects.begin();
+		 gameObjectX != this->gameObjects.end(); ++gameObjectX) {
+		for (auto gameObjectY = std::next(gameObjectX);
+			 gameObjectY != this->gameObjects.end(); ++gameObjectY) {
+			if (CheckCollision(gameObjectX->second,
+							   gameObjectY->second) !=
+				CollisionType::NONE) {
+				OnCollision(reinterpret_cast<PhysicsObject *>(
+								gameObjectX->second),
+							reinterpret_cast<PhysicsObject *>(
+								gameObjectY->second));
+			}
+		}
 	}
 	for (const auto &event : this->eventList) {
 		this->events[event]->Process(this, dt);
@@ -85,6 +101,12 @@ void GameProject::Render() {
 }
 
 void GameProject::CleanUp() {
+	for (auto [key, gameObject] : this->gameObjects) {
+		gameObject->RemoveObjectEvents(&this->events);
+		delete gameObject;
+	}
+	this->gameObjects.clear();
+	this->zIndexQueue.clear();
 	// Delete all resources as loaded using the resource manager
 	ResourceManager::Clear();
 }
@@ -97,6 +119,9 @@ auto createNewGameObject(YAML::Node &object) -> GameObject * {
 	// TODO(shiyihang): 添加名称至类型的映射
 	if (object["type"].as<std::string>() == "staticObject") {
 		gameObject = new StaticObject;
+	}
+	else if (object["type"].as<std::string>() == "physicsObject") {
+		gameObject = new PhysicsObject;
 	}
 	else {
 		gameObject = new GameObject;

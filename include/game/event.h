@@ -1,6 +1,7 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "game/command.h"
 #include "game/gameBase.h"
 #include "game/gameObject.h"
 
@@ -9,18 +10,16 @@
 
 class Event {
 	GameObject *self;
-	void (*callback)(GameObject *self, GameBase *game,
-					 float deltaTime);
+	Command *command;
 
   public:
-	Event(GameObject *self,
-		  void (*callback)(GameObject *self, GameBase *game,
-						   float deltaTime)) {
+	Event(GameObject *self, Command *command) {
 		this->self = self;
-		this->callback = callback;
+		this->command = command;
 	}
+	~Event() = default;
 	void Process(GameBase *game, float deltaTime) {
-		this->callback(this->self, game, deltaTime);
+		this->command->Execute(this->self, game, deltaTime);
 	}
 };
 

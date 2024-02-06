@@ -48,18 +48,27 @@ class GameObject {
 		return "none";
 	}
 
+	[[nodiscard]] auto GetName() const -> std::string {
+		return this->name;
+	}
+
+	void SetPosX(float posx) { this->posx = posx; }
 	[[nodiscard]] auto GetPosX() const -> float {
 		return this->posx;
 	}
+	void SetPosY(float posy) { this->posy = posy; }
 	[[nodiscard]] auto GetPosY() const -> float {
 		return this->posy;
 	}
+	void SetWidth(float width) { this->width = width; }
 	[[nodiscard]] auto GetWidth() const -> float {
 		return this->width;
 	}
+	void SetHeight(float height) { this->height = height; }
 	[[nodiscard]] auto GetHeight() const -> float {
 		return this->height;
 	}
+	void SetRotation(float rotation) { this->rotation = rotation; }
 	[[nodiscard]] auto GetRotation() const -> float {
 		return this->rotation;
 	}

@@ -53,100 +53,51 @@ class CommandSwitchStateToGamePlay : public Command {
 	}
 };
 
-class CommandMoveUp : public Command {
+class CommandRigidMoveLeft : public Command {
   protected:
-	CommandMoveUp() = default;
+	CommandRigidMoveLeft() = default;
 
   public:
 	void Execute(GameObject *self, GameBase *game,
 				 float deltaTime) override;
 	static auto Instance() -> Command * {
-		static CommandMoveUp _instance;
+		static CommandRigidMoveLeft _instance;
 		return &_instance;
 	}
 };
-class CommandMoveDown : public Command {
+class CommandRigidMoveRight : public Command {
   protected:
-	CommandMoveDown() = default;
+	CommandRigidMoveRight() = default;
 
   public:
 	void Execute(GameObject *self, GameBase *game,
 				 float deltaTime) override;
 	static auto Instance() -> Command * {
-		static CommandMoveDown _instance;
+		static CommandRigidMoveRight _instance;
 		return &_instance;
 	}
 };
-class CommandMoveLeft : public Command {
+class CommandRigidJump : public Command {
   protected:
-	CommandMoveLeft() = default;
+	CommandRigidJump() = default;
 
   public:
 	void Execute(GameObject *self, GameBase *game,
 				 float deltaTime) override;
 	static auto Instance() -> Command * {
-		static CommandMoveLeft _instance;
+		static CommandRigidJump _instance;
 		return &_instance;
 	}
 };
-class CommandMoveRight : public Command {
+class CommandRigidFall : public Command {
   protected:
-	CommandMoveRight() = default;
+	CommandRigidFall() = default;
 
   public:
 	void Execute(GameObject *self, GameBase *game,
 				 float deltaTime) override;
 	static auto Instance() -> Command * {
-		static CommandMoveRight _instance;
-		return &_instance;
-	}
-};
-
-class CommandPhysicsMoveUp : public Command {
-  protected:
-	CommandPhysicsMoveUp() = default;
-
-  public:
-	void Execute(GameObject *self, GameBase *game,
-				 float deltaTime) override;
-	static auto Instance() -> Command * {
-		static CommandPhysicsMoveUp _instance;
-		return &_instance;
-	}
-};
-class CommandPhysicsMoveDown : public Command {
-  protected:
-	CommandPhysicsMoveDown() = default;
-
-  public:
-	void Execute(GameObject *self, GameBase *game,
-				 float deltaTime) override;
-	static auto Instance() -> Command * {
-		static CommandPhysicsMoveDown _instance;
-		return &_instance;
-	}
-};
-class CommandPhysicsMoveLeft : public Command {
-  protected:
-	CommandPhysicsMoveLeft() = default;
-
-  public:
-	void Execute(GameObject *self, GameBase *game,
-				 float deltaTime) override;
-	static auto Instance() -> Command * {
-		static CommandPhysicsMoveLeft _instance;
-		return &_instance;
-	}
-};
-class CommandPhysicsMoveRight : public Command {
-  protected:
-	CommandPhysicsMoveRight() = default;
-
-  public:
-	void Execute(GameObject *self, GameBase *game,
-				 float deltaTime) override;
-	static auto Instance() -> Command * {
-		static CommandPhysicsMoveRight _instance;
+		static CommandRigidFall _instance;
 		return &_instance;
 	}
 };

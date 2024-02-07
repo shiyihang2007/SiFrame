@@ -18,6 +18,7 @@
 				 : defaultValue
 class GameObject {
   protected:
+	std::string type;
 	std::string name;
 	std::string spriteId;
 	float posx, posy;
@@ -48,6 +49,16 @@ class GameObject {
 		return "none";
 	}
 
+	[[nodiscard]] virtual auto IsPhysicsObject() const -> bool {
+		return false;
+	}
+	[[nodiscard]] virtual auto IsRigid() const -> bool {
+		return false;
+	}
+
+	[[nodiscard]] auto GetType() const -> std::string {
+		return this->type;
+	}
 	[[nodiscard]] auto GetName() const -> std::string {
 		return this->name;
 	}

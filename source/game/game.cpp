@@ -1,5 +1,7 @@
 #include "game/game.h"
+#include "game/physicsFixedObject.h"
 #include "game/physicsObject.h"
+#include "game/rigidObject.h"
 #include "resource_manager.h"
 
 #include "spdlog/spdlog.h"
@@ -68,18 +70,28 @@ void GameProject::ProcessInput(float dt) {
 }
 
 void GameProject::Update(float dt) {
+	// spdlog::debug("Updating game, dt: {}s", dt);
 	for (auto &[zindex, key] :
 		 std::ranges::reverse_view(this->zIndexQueue)) {
 		this->gameObjects[key]->Update(dt);
 	}
-	// TODO(shiyihang): Optimize, Do not check the same object again
 	for (auto gameObjectX = this->gameObjects.begin();
 		 gameObjectX != this->gameObjects.end(); ++gameObjectX) {
+		if (!gameObjectX->second->IsPhysicsObject()) {
+			continue;
+		}
 		for (auto gameObjectY = std::next(gameObjectX);
 			 gameObjectY != this->gameObjects.end(); ++gameObjectY) {
-			if (CheckCollision(gameObjectX->second,
-							   gameObjectY->second) !=
-				CollisionType::NONE) {
+			if (!gameObjectY->second->IsPhysicsObject()) {
+				continue;
+			}
+			if (gameObjectX->second == gameObjectY->second) {
+				continue;
+			}
+			if (CheckCollision(reinterpret_cast<PhysicsObject *>(
+								   gameObjectX->second),
+							   reinterpret_cast<PhysicsObject *>(
+								   gameObjectY->second))) {
 				OnCollision(reinterpret_cast<PhysicsObject *>(
 								gameObjectX->second),
 							reinterpret_cast<PhysicsObject *>(
@@ -122,6 +134,13 @@ auto createNewGameObject(YAML::Node &object) -> GameObject * {
 	}
 	else if (object["type"].as<std::string>() == "physicsObject") {
 		gameObject = new PhysicsObject;
+	}
+	else if (object["type"].as<std::string>() ==
+			 "physicsFixedObject") {
+		gameObject = new PhysicsFixedObject;
+	}
+	else if (object["type"].as<std::string>() == "rigidObject") {
+		gameObject = new RigidObject;
 	}
 	else {
 		gameObject = new GameObject;

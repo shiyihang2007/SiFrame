@@ -1,5 +1,12 @@
 #include "game/command.h"
+#include "game/gameObject.h"
 #include "game/physicsObject.h"
+#include "game/rigidObject.h"
+
+#include <map>
+#include <string>
+
+extern YAML::Node config;
 
 void CommandNone::Execute(GameObject *self, GameBase *game,
 						  float deltaTime) {}
@@ -15,43 +22,49 @@ void CommandSwitchStateToGamePlay::Execute(GameObject *self,
 	game->ChangeState("GamePlay");
 }
 
-void CommandMoveLeft::Execute(GameObject *self, GameBase *game,
-							  float deltaTime) {
-	self->SetPosY(self->GetPosY() - 30.0F * deltaTime);
-}
-void CommandMoveRight::Execute(GameObject *self, GameBase *game,
-							   float deltaTime) {
-	self->SetPosY(self->GetPosY() + 30.0F * deltaTime);
-}
-void CommandMoveUp::Execute(GameObject *self, GameBase *game,
-							float deltaTime) {
-	self->SetPosX(self->GetPosX() - 30.0F * deltaTime);
-}
-void CommandMoveDown::Execute(GameObject *self, GameBase *game,
-							  float deltaTime) {
-	self->SetPosX(self->GetPosX() + 30.0F * deltaTime);
-}
-
-void CommandPhysicsMoveLeft::Execute(GameObject *self,
-									 GameBase *game,
-									 float deltaTime) {
-	reinterpret_cast<PhysicsObject *>(self)->AddForce(
-		-300.0F * deltaTime, 0.0F);
-}
-void CommandPhysicsMoveRight::Execute(GameObject *self,
-									  GameBase *game,
-									  float deltaTime) {
-	reinterpret_cast<PhysicsObject *>(self)->AddForce(
-		300.0F * deltaTime, 0.0F);
-}
-void CommandPhysicsMoveUp::Execute(GameObject *self, GameBase *game,
+void CommandRigidMoveLeft::Execute(GameObject *self, GameBase *game,
 								   float deltaTime) {
-	reinterpret_cast<PhysicsObject *>(self)->AddForce(
-		0.0F, -300.0F * deltaTime);
+	auto *rigid = reinterpret_cast<RigidObject *>(self);
+	rigid->AddForce(
+		-3.0F * rigid->GetMess() *
+			config["physics"]["pixelsPerMeter"].as<float>() *
+			deltaTime,
+		0.0F);
 }
-void CommandPhysicsMoveDown::Execute(GameObject *self,
-									 GameBase *game,
-									 float deltaTime) {
-	reinterpret_cast<PhysicsObject *>(self)->AddForce(
-		0.0F, 300.0F * deltaTime);
+void CommandRigidMoveRight::Execute(GameObject *self, GameBase *game,
+									float deltaTime) {
+	auto *rigid = reinterpret_cast<RigidObject *>(self);
+	rigid->AddForce(
+		3.0F * rigid->GetMess() *
+			config["physics"]["pixelsPerMeter"].as<float>() *
+			deltaTime,
+		0.0F);
+}
+void CommandRigidJump::Execute(GameObject *self, GameBase *game,
+							   float deltaTime) {
+	auto *rigid = reinterpret_cast<RigidObject *>(self);
+	if (rigid->IsVirtual()) {
+		return;
+	}
+	if (rigid->GetJumpAble() == 0) {
+		return;
+	}
+	if (rigid->GetJumpColdDown() != 0) {
+		return;
+	}
+	rigid->SubJumpAble();
+	rigid->ResetJumpColdDown();
+	rigid->SetVelocityY(0.0F);
+	rigid->AddForce(
+		0.0F, -2.0F * rigid->GetMess() *
+				  config["physics"]["pixelsPerMeter"].as<float>());
+	rigid->AddVirtualTime(0.1F);
+}
+void CommandRigidFall::Execute(GameObject *self, GameBase *game,
+							   float deltaTime) {
+	auto *rigid = reinterpret_cast<RigidObject *>(self);
+	// if (rigid->GetJumpAble() != RigidObject::GetJumpAbility()) {
+	// 	return;
+	// }
+	rigid->AddVirtualTime(0.02F);
 }

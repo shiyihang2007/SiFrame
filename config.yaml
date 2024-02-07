@@ -4,6 +4,13 @@ window:
   width: 800
   height: 600
   title: Example
+physics:
+  gravity: 9.81
+  pixelsPerMeter: 20
+  airFrictionFactor: 0.02
+  plateFrictionFactor: 0.5
+  jumpAbility: 2
+  jumpColdDownTime: 0.1
 textures:
   - id: unknown
     path: ./texture/unknown.png
@@ -37,28 +44,49 @@ states:
         type: gameObject
       - name: player1
         posx: 100
-        posy: 300
+        posy: -100
         width: 20
-        height: 20
-        type: physicsObject
+        height: 40
+        type: rigidObject
       - name: player2
         posx: 300
-        posy: 300
+        posy: -100
         width: 20
-        height: 20
-        type: physicsObject
+        height: 40
+        type: rigidObject
       - name: player3
         posx: 500
-        posy: 300
+        posy: -100
         width: 20
-        height: 20
-        type: gameObject
+        height: 40
+        type: rigidObject
       - name: player4
-        posx: 700
-        posy: 300
+        posx: 600
+        posy: -100
         width: 20
-        height: 20
-        type: gameObject
+        height: 40
+        type: rigidObject
+      - name: plate1
+        posx: 100
+        posy: 500
+        width: 300
+        height: 25
+        type: physicsFixedObject
+        mess: 100
+      - name: plate2
+        posx: 400
+        posy: 450
+        width: 300
+        height: 25
+        type: physicsFixedObject
+        mess: 100
+      - name: plate3
+        posx: 250
+        posy: 375
+        width: 250
+        height: 25
+        type: physicsFixedObject
+        mess: 100
       - name: exitButton
         posx: 100
         posy: 100

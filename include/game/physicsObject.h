@@ -3,12 +3,19 @@
 
 #include "game/gameObject.h"
 
+#include <map>
+#include <string>
 #include <utility>
+#include <vector>
 
 class PhysicsObject : public GameObject {
   protected:
 	float velocityX, velocityY;
 	float mess;
+
+	bool isColliding = false;
+
+	float virtualTime = 0.0F;
 
   public:
 	PhysicsObject() = default;
@@ -17,19 +24,30 @@ class PhysicsObject : public GameObject {
 
 	void Update(float dt) override;
 
+	[[nodiscard]] auto IsPhysicsObject() const -> bool override {
+		return true;
+	}
+	[[nodiscard]] auto IsRigid() const -> bool override {
+		return false;
+	}
+	[[nodiscard]] auto IsVirtual() const -> bool {
+		return virtualTime > 0.0F;
+	}
+
 	void InsertObjectEvents(void *events) override;
 	void RemoveObjectEvents(void *events) override;
 
 	virtual void AddForce(float x, float y);
+	void AddVirtualTime(float time) { this->virtualTime += time; }
 
-	[[nodiscard]] virtual auto GetVelocity() const
+	[[nodiscard]] auto GetVelocity() const
 		-> std::pair<float, float> {
 		return {this->velocityX, this->velocityY};
 	}
-	[[nodiscard]] virtual auto GetVelocityX() const -> float {
+	[[nodiscard]] auto GetVelocityX() const -> float {
 		return this->velocityX;
 	}
-	[[nodiscard]] virtual auto GetVelocityY() const -> float {
+	[[nodiscard]] auto GetVelocityY() const -> float {
 		return this->velocityY;
 	}
 	virtual void SetVelocity(float x, float y) {
@@ -42,20 +60,25 @@ class PhysicsObject : public GameObject {
 	}
 	virtual void SetVelocityX(float x) { this->velocityX = x; }
 	virtual void SetVelocityY(float y) { this->velocityY = y; }
-	[[nodiscard]] virtual auto GetMess() const -> float {
+	[[nodiscard]] auto GetMess() const -> float {
 		return this->mess;
 	}
-	virtual void SetMess(float mess) { this->mess = mess; }
+	void SetMess(float mess) { this->mess = mess; }
+
+	void SetColliding(bool isColliding) {
+		this->isColliding = isColliding;
+	}
+	[[nodiscard]] auto IsColliding() const -> bool {
+		return this->isColliding;
+	}
+
+	auto
+	CheckCollisionWith(std::map<std::string, GameObject *> *objects)
+		-> std::vector<std::string>;
 };
 
-enum class CollisionType { NONE, LEFT, RIGHT, TOP, BOTTOM };
-
-auto CheckCollision(GameObject *obj1, GameObject *obj2)
-	-> CollisionType;
-auto CheckCollision(PhysicsObject *obj1, GameObject *obj2)
-	-> CollisionType;
 auto CheckCollision(PhysicsObject *obj1, PhysicsObject *obj2)
-	-> CollisionType;
+	-> bool;
 
 void OnCollision(PhysicsObject *obj1, PhysicsObject *obj2);
 

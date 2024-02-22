@@ -56,7 +56,7 @@ void CommandRigidJump::Execute(GameObject *self, GameBase *game,
 	rigid->ResetJumpColdDown();
 	rigid->SetVelocityY(0.0F);
 	rigid->AddForce(
-		0.0F, -2.0F * rigid->GetMess() *
+		0.0F, -1.0F * rigid->GetMess() *
 				  config["physics"]["pixelsPerMeter"].as<float>());
 	rigid->AddVirtualTime(0.1F);
 }

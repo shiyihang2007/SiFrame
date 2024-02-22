@@ -3,6 +3,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "game/adapter.h"
 
@@ -25,6 +26,8 @@ class GameObject {
 	float width, height;
 	float rotation;
 	float colorR, colorG, colorB;
+
+	std::set<std::string> tags;
 
   public:
 	explicit GameObject(std::string spriteId = "unknown",
@@ -49,11 +52,14 @@ class GameObject {
 		return "none";
 	}
 
-	[[nodiscard]] virtual auto IsPhysicsObject() const -> bool {
-		return false;
+	[[nodiscard]] virtual auto CheckTag(std::string tag) -> bool {
+		return tags.contains(tag);
 	}
-	[[nodiscard]] virtual auto IsRigid() const -> bool {
-		return false;
+	virtual auto AddTag(const std::string &tag) -> void {
+		tags.insert(tag);
+	}
+	virtual auto RemoveTag(const std::string &tag) -> void {
+		tags.erase(tag);
 	}
 
 	[[nodiscard]] auto GetType() const -> std::string {

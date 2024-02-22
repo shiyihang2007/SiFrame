@@ -77,15 +77,17 @@ void GameProject::Update(float dt) {
 	}
 	for (auto gameObjectX = this->gameObjects.begin();
 		 gameObjectX != this->gameObjects.end(); ++gameObjectX) {
-		if (!gameObjectX->second->IsPhysicsObject()) {
+		if (!gameObjectX->second->CheckTag("Physics")) {
 			continue;
 		}
 		for (auto gameObjectY = std::next(gameObjectX);
 			 gameObjectY != this->gameObjects.end(); ++gameObjectY) {
-			if (!gameObjectY->second->IsPhysicsObject()) {
+			if (!gameObjectY->second->CheckTag("Physics")) {
 				continue;
 			}
-			if (gameObjectX->second == gameObjectY->second) {
+			if (gameObjectX->second == gameObjectY->second ||
+				!(gameObjectY->second->CheckTag("Fixed") ||
+				  gameObjectX->second->CheckTag("Fixed"))) {
 				continue;
 			}
 			if (CheckCollision(reinterpret_cast<PhysicsObject *>(

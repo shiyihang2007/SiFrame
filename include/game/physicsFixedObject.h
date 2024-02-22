@@ -8,8 +8,9 @@ class PhysicsFixedObject : public PhysicsObject {
 	PhysicsFixedObject() = default;
 	~PhysicsFixedObject() override = default;
 
-	[[nodiscard]] auto IsRigid() const -> bool override {
-		return false;
+	void SetObjectByYaml(const YAML::Node &object) override {
+		PhysicsObject::SetObjectByYaml(object);
+		tags.insert("Fixed");
 	}
 
 	void AddForce(float x, float y) override {}

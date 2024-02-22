@@ -24,12 +24,6 @@ class PhysicsObject : public GameObject {
 
 	void Update(float dt) override;
 
-	[[nodiscard]] auto IsPhysicsObject() const -> bool override {
-		return true;
-	}
-	[[nodiscard]] auto IsRigid() const -> bool override {
-		return false;
-	}
 	[[nodiscard]] auto IsVirtual() const -> bool {
 		return virtualTime > 0.0F;
 	}
@@ -38,7 +32,10 @@ class PhysicsObject : public GameObject {
 	void RemoveObjectEvents(void *events) override;
 
 	virtual void AddForce(float x, float y);
-	void AddVirtualTime(float time) { this->virtualTime += time; }
+	void AddVirtualTime(float time) {
+		this->tags.insert("Virtual");
+		this->virtualTime += time;
+	}
 
 	[[nodiscard]] auto GetVelocity() const
 		-> std::pair<float, float> {

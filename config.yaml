@@ -5,18 +5,21 @@ window:
   height: 600
   title: Example
 physics:
-  gravity: 9.81
+  gravity: 3
   pixelsPerMeter: 20
   airFrictionFactor: 0.02
   plateFrictionFactor: 0.5
   jumpAbility: 2
-  jumpColdDownTime: 0.1
+  jumpColdDownTime: 0.3
 textures:
   - id: unknown
     path: ./texture/unknown.png
     alpha: true
   - id: BackgroundSprite
     path: ./texture/background.png
+    alpha: true
+  - id: PlayerSprite
+    path: ./texture/player.png
     alpha: true
 states:
   MainMenu:
@@ -43,29 +46,45 @@ states:
         zindex: -100
         type: gameObject
       - name: player1
+        spriteId: PlayerSprite
         posx: 100
         posy: -100
         width: 20
-        height: 40
+        height: 32
         type: rigidObject
+        colorR: 1.0
+        colorG: 0.8
+        colorB: 0.8
       - name: player2
+        spriteId: PlayerSprite
         posx: 300
         posy: -100
         width: 20
-        height: 40
+        height: 32
         type: rigidObject
+        colorR: 0.8
+        colorG: 1.0
+        colorB: 0.8
       - name: player3
+        spriteId: PlayerSprite
         posx: 500
         posy: -100
         width: 20
-        height: 40
+        height: 32
         type: rigidObject
+        colorR: 0.8
+        colorG: 0.8
+        colorB: 1.0
       - name: player4
+        spriteId: PlayerSprite
         posx: 600
         posy: -100
         width: 20
-        height: 40
+        height: 32
         type: rigidObject
+        colorR: 0.9
+        colorG: 0.9
+        colorB: 0.8
       - name: plate1
         posx: 100
         posy: 500

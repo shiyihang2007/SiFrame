@@ -6,6 +6,11 @@
 
 extern YAML::Node config;
 
+void RigidObject::SetObjectByYaml(const YAML::Node &object) {
+	PhysicsObject::SetObjectByYaml(object);
+	this->tags.insert("Rigid");
+}
+
 void RigidObject::Update(float dt) {
 	this->PhysicsObject::Update(dt);
 	this->jumpColdDown = std::max(0.0F, this->jumpColdDown - dt);
@@ -28,6 +33,12 @@ void RigidObject::Update(float dt) {
 		0.0F, config["physics"]["gravity"].as<float>() *
 				  this->GetMess() * dt *
 				  config["physics"]["pixelsPerMeter"].as<float>());
+	// limit fall speed
+	if (this->velocityY >
+		2.0F * config["physics"]["pixelsPerMeter"].as<float>()) {
+		this->velocityY =
+			2.0F * config["physics"]["pixelsPerMeter"].as<float>();
+	}
 }
 
 void RigidObject::InsertObjectEvents(void *eventsV) {

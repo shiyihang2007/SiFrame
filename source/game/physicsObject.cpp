@@ -16,6 +16,7 @@ auto PhysicsObject::SetObjectByYaml(const YAML::Node &object)
 	GAME_OBJECT_SET_MEMBER_DEFAULT(velocityX, 0.0F);
 	GAME_OBJECT_SET_MEMBER_DEFAULT(velocityY, 0.0F);
 	GAME_OBJECT_SET_MEMBER_DEFAULT(mess, 1.0F);
+	this->tags.insert("Physics");
 }
 
 auto PhysicsObject::Update(float dt) -> void {
@@ -66,8 +67,9 @@ auto PhysicsObject::Update(float dt) -> void {
 	// virtual time
 	if (this->virtualTime > 0.0F) {
 		this->virtualTime -= dt;
-		if (this->virtualTime < 0.0F) {
+		if (this->virtualTime <= 0.0F) {
 			this->virtualTime = 0.0F;
+			this->tags.erase("Virtual");
 		}
 	}
 }
@@ -91,7 +93,7 @@ auto PhysicsObject::CheckCollisionWith(
 	-> std::vector<std::string> {
 	std::vector<std::string> collidedObjects;
 	for (auto &[key, object] : *objects) {
-		if (!object->IsPhysicsObject()) {
+		if (!object->CheckTag("Physics")) {
 			continue;
 		}
 		if (CheckCollision(
@@ -104,7 +106,7 @@ auto PhysicsObject::CheckCollisionWith(
 
 auto CheckCollision(PhysicsObject *obj1, PhysicsObject *obj2)
 	-> bool {
-	if (obj1->IsVirtual() || obj2->IsVirtual()) {
+	if (obj1->CheckTag("Virtual") || obj2->CheckTag("Virtual")) {
 		return false;
 	}
 	if (obj1->GetPosX() + obj1->GetWidth() > obj2->GetPosX() &&
@@ -115,8 +117,6 @@ auto CheckCollision(PhysicsObject *obj1, PhysicsObject *obj2)
 		obj2->SetColliding(true);
 		return true;
 	}
-	obj1->SetColliding(false);
-	obj2->SetColliding(false);
 	return false;
 }
 
@@ -126,11 +126,11 @@ void OnCollision(PhysicsObject *obj1, PhysicsObject *obj2) {
 	auto m1 = obj1->GetMess();
 	auto m2 = obj2->GetMess();
 	// For RigidObject, only do the downside collision
-	if (obj1->IsRigid() || obj2->IsRigid()) {
-		if (obj1->IsRigid() && obj2->IsRigid()) {
+	if (obj1->CheckTag("Rigid") || obj2->CheckTag("Rigid")) {
+		if (obj1->CheckTag("Rigid") && obj2->CheckTag("Rigid")) {
 			return;
 		}
-		if (obj1->IsRigid()) {
+		if (obj1->CheckTag("Rigid")) {
 			std::swap(obj1, obj2);
 		}
 		if (obj1->GetPosY() <

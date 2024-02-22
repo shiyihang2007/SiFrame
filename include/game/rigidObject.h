@@ -12,9 +12,7 @@ class RigidObject : public PhysicsObject {
 	RigidObject() = default;
 	~RigidObject() override = default;
 
-	[[nodiscard]] auto IsRigid() const -> bool override {
-		return true;
-	}
+	void SetObjectByYaml(const YAML::Node &object) override;
 
 	void Update(float dt) override;
 

@@ -27,6 +27,7 @@ void GameObject::SetObjectByYaml(const YAML::Node &object) {
 	GAME_OBJECT_SET_MEMBER_DEFAULT(colorR, 1.0F);
 	GAME_OBJECT_SET_MEMBER_DEFAULT(colorG, 1.0F);
 	GAME_OBJECT_SET_MEMBER_DEFAULT(colorB, 1.0F);
+	this->tags.insert("Object");
 }
 
 void GameObject::InsertObjectEvents(void *eventsV) {

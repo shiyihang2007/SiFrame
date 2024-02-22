@@ -14,7 +14,7 @@ enable_testing()
 include_directories(include)
 
 # libs
-set(libs libglfw3.a)
+set(libs)
 link_directories(lib/)
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	link_directories(lib/windows)
@@ -51,13 +51,21 @@ set(libs ${libs} yaml-cpp)
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/spdlog/CMakeLists.txt")
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
-add_subdirectory(3rdparty/spdlog lib/spdlog)
+add_subdirectory(3rdparty/spdlog)
 if(NOT TARGET spdlog)
     # Stand-alone build
     find_package(spdlog REQUIRED)
 endif()
 include_directories(3rdparty/spdlog/include)
 set(libs ${libs} spdlog::spdlog)
+
+# glfw
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/glfw/CMakeLists.txt")
+    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
+add_subdirectory(3rdparty/glfw)
+include_directories(3rdparty/glfw/include)
+set(libs ${libs} glfw)
 
 # sources
 file(GLOB sources CONFIGURE_DEPENDS ./source/*.c*  ./source/game/*.c*)

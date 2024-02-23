@@ -14,7 +14,6 @@
 #include <iostream>
 #include <sstream>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 // Instantiate static variables
@@ -26,7 +25,8 @@ auto ResourceManager::LoadShader(const char *vShaderFile,
 								 const char *fShaderFile,
 								 const char *gShaderFile,
 								 const std::string &name) -> Shader {
-	Shaders[name] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
+	Shaders[name] =
+		loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
 	return Shaders[name];
 }
 
@@ -35,12 +35,14 @@ auto ResourceManager::GetShader(const std::string &name) -> Shader {
 }
 
 auto ResourceManager::LoadTexture(const char *file, bool alpha,
-								  const std::string &name) -> Texture2D {
+								  const std::string &name)
+	-> Texture2D {
 	Textures[name] = loadTextureFromFile(file, alpha);
 	return Textures[name];
 }
 
-auto ResourceManager::GetTexture(const std::string &name) -> Texture2D {
+auto ResourceManager::GetTexture(const std::string &name)
+	-> Texture2D {
 	return Textures[name];
 }
 
@@ -57,12 +59,14 @@ void ResourceManager::Clear() {
 
 auto ResourceManager::loadShaderFromFile(const char *vShaderFile,
 										 const char *fShaderFile,
-										 const char *gShaderFile) -> Shader {
+										 const char *gShaderFile)
+	-> Shader {
 	// debug: 输出着色器文件路径
 	//    std::cerr << "[debug] vShaderFile:" << vShaderFile << "\n";
 	//    std::cerr << "[debug] fShaderFile:" << fShaderFile << "\n";
-	//    std::cerr << "[debug] gShaderFile:" << (gShaderFile == nullptr ?
-	//    "nullptr" : gShaderFile) << "\n"; std::cerr << "\n--
+	//    std::cerr << "[debug] gShaderFile:" << (gShaderFile ==
+	//    nullptr ? "nullptr" : gShaderFile) << "\n"; std::cerr <<
+	//    "\n--
 	//    ------------------------- --\n";
 	// 1. retrieve the vertex/fragment source code from filePath
 	std::string vertexCode;
@@ -83,7 +87,8 @@ auto ResourceManager::loadShaderFromFile(const char *vShaderFile,
 		// convert stream into string
 		vertexCode = vShaderStream.str();
 		fragmentCode = fShaderStream.str();
-		// if geometry shader path is present, also load a geometry shader
+		// if geometry shader path is present, also load a geometry
+		// shader
 		if (gShaderFile != nullptr) {
 			std::ifstream geometryShaderFile(gShaderFile);
 			std::stringstream gShaderStream;
@@ -92,7 +97,8 @@ auto ResourceManager::loadShaderFromFile(const char *vShaderFile,
 			geometryCode = gShaderStream.str();
 		}
 	} catch (std::exception &e) {
-		std::cout << "ERROR::SHADER: Failed to read shader files" << std::endl;
+		std::cout << "ERROR::SHADER: Failed to read shader files"
+				  << std::endl;
 	}
 	const char *vShaderCode = vertexCode.c_str();
 	const char *fShaderCode = fragmentCode.c_str();
@@ -109,8 +115,8 @@ auto ResourceManager::loadShaderFromFile(const char *vShaderFile,
 	return shader;
 }
 
-auto ResourceManager::loadTextureFromFile(const char *file, bool alpha)
-	-> Texture2D {
+auto ResourceManager::loadTextureFromFile(const char *file,
+										  bool alpha) -> Texture2D {
 	// create texture object
 	Texture2D texture;
 	if (alpha) {
@@ -121,7 +127,8 @@ auto ResourceManager::loadTextureFromFile(const char *file, bool alpha)
 	int width;
 	int height;
 	int nrChannels;
-	unsigned char *data = stbi_load(file, &width, &height, &nrChannels, 0);
+	unsigned char *data =
+		stbi_load(file, &width, &height, &nrChannels, 0);
 	// now generate texture
 	texture.Generate(width, height, data);
 	// and finally free image data

@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <map>
+#include <numbers>
 #include <string>
 
 extern YAML::Node config;
@@ -96,6 +97,9 @@ void CommandRigidFire::Execute(GameObject *self, GameBase *game,
 			self->GetWidth() */);
 	bullet->SetPosY(self->GetPosY() + self->GetHeight() / 2 -
 					bullet->GetHeight() / 2);
+	bullet->SetRotation(rigid->GetFacing() == RigidObject::LEFT
+							? std::numbers::pi
+							: 0.0F);
 	bullet->SetOwner(self);
 	bullet->ResetLifeTime();
 	game->AddObject(
@@ -106,8 +110,8 @@ void CommandRigidFire::Execute(GameObject *self, GameBase *game,
 		bullet);
 	rigid->AddForce(
 		(rigid->GetFacing() == RigidObject::LEFT
-			 ? 0.1 * config["physics"]["pixelsPerMeter"].as<float>()
-			 : -0.1 *
+			 ? 0.3 * config["physics"]["pixelsPerMeter"].as<float>()
+			 : -0.3 *
 				   config["physics"]["pixelsPerMeter"].as<float>()) /
 			rigid->GetMess(),
 		-0.1F * config["physics"]["pixelsPerMeter"].as<float>());

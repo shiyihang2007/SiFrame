@@ -125,7 +125,7 @@ void GameProject::Update(float dt) {
 		 ++it) {
 		auto key = it->second;
 		if (this->gameObjects[key]->CheckTag("Deleted")) {
-			spdlog::debug("Deleted Object '{}'", key);
+			// spdlog::debug("Deleted Object '{}'", key);
 			delete this->gameObjects[key];
 			gameObjects.erase(key);
 			it = --zIndexQueue.erase(it);
@@ -233,7 +233,7 @@ void GameProject::ChangeState(GameState newState) {
 }
 
 void GameProject::AddObject(std::string name, void *obj) {
-	spdlog::debug("Added Object '{}'", name);
+	// spdlog::debug("Added Object '{}'", name);
 	gameObjects[name] = reinterpret_cast<GameObject *>(obj);
 	this->zIndexQueue.emplace(0, name);
 }

@@ -21,6 +21,9 @@ textures:
   - id: PlayerSprite
     path: ./texture/player.png
     alpha: true
+  - id: PlateSprite
+    path: ./texture/plate.png
+    alpha: true
 states:
   MainMenu:
     objects:
@@ -55,6 +58,7 @@ states:
         colorR: 1.0
         colorG: 0.8
         colorB: 0.8
+        fireColdDownTime: 0.1
       - name: player2
         spriteId: PlayerSprite
         posx: 300
@@ -65,6 +69,7 @@ states:
         colorR: 0.8
         colorG: 1.0
         colorB: 0.8
+        fireColdDownTime: 0.5
       - name: player3
         spriteId: PlayerSprite
         posx: 500
@@ -75,6 +80,7 @@ states:
         colorR: 0.8
         colorG: 0.8
         colorB: 1.0
+        fireColdDownTime: 0.3
       - name: player4
         spriteId: PlayerSprite
         posx: 600
@@ -85,7 +91,9 @@ states:
         colorR: 0.9
         colorG: 0.9
         colorB: 0.8
+        fireColdDownTime: 0.8
       - name: plate1
+        spriteId: PlateSprite
         posx: 100
         posy: 500
         width: 300
@@ -93,6 +101,7 @@ states:
         type: physicsFixedObject
         mess: 100
       - name: plate2
+        spriteId: PlateSprite
         posx: 400
         posy: 450
         width: 300
@@ -100,6 +109,7 @@ states:
         type: physicsFixedObject
         mess: 100
       - name: plate3
+        spriteId: PlateSprite
         posx: 250
         posy: 375
         width: 250
@@ -113,6 +123,12 @@ states:
         height: 20
         type: staticObject
         onClickEvent: switchStateToMainMenu
+      - name: BulletPrototype
+        posx: -100
+        posy: -100
+        width: 5
+        height: 5
+        type: bulletObject
     keyMap:
       - key: w
         action: player1MoveUp
@@ -122,6 +138,8 @@ states:
         action: player1MoveLeft
       - key: d
         action: player1MoveRight
+      - key: lshift
+        action: player1Fire
       - key: up
         action: player2MoveUp
       - key: down
@@ -130,6 +148,8 @@ states:
         action: player2MoveLeft
       - key: right
         action: player2MoveRight
+      - key: rctrl
+        action: player2Fire
       - key: i
         action: player3MoveUp
       - key: k
@@ -138,6 +158,8 @@ states:
         action: player3MoveLeft
       - key: l
         action: player3MoveRight
+      - key: ;
+        action: player3Fire
       - key: num8
         action: player4MoveUp
       - key: num2
@@ -146,3 +168,5 @@ states:
         action: player4MoveLeft
       - key: num6
         action: player4MoveRight
+      - key: numenter
+        action: player4Fire

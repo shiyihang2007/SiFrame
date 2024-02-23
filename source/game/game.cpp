@@ -1,4 +1,7 @@
 #include "game/game.h"
+#include "game/bulletObject.h"
+#include "game/gameBase.h"
+#include "game/gameObject.h"
 #include "game/physicsFixedObject.h"
 #include "game/physicsObject.h"
 #include "game/rigidObject.h"
@@ -13,6 +16,15 @@
 #include <vector>
 
 extern YAML::Node config;
+
+GameProject::GameProject(int width, int height)
+	: width(width), height(height) {}
+GameProject::~GameProject() {
+	GameBase::~GameBase();
+	for (auto [key, it] : gameObjects) {
+		delete it;
+	}
+}
 
 void GameProject::Init() {
 	spdlog::info("Initializing game");
@@ -73,8 +85,13 @@ void GameProject::Update(float dt) {
 	// spdlog::debug("Updating game, dt: {}s", dt);
 	for (auto &[zindex, key] :
 		 std::ranges::reverse_view(this->zIndexQueue)) {
-		this->gameObjects[key]->Update(dt);
+		if (!this->gameObjects[key]->CheckTag("Physics")) {
+			continue;
+		}
+		reinterpret_cast<PhysicsObject *>(this->gameObjects[key])
+			->SetColliding(false);
 	}
+	// Check Collision
 	for (auto gameObjectX = this->gameObjects.begin();
 		 gameObjectX != this->gameObjects.end(); ++gameObjectX) {
 		if (!gameObjectX->second->CheckTag("Physics")) {
@@ -83,11 +100,6 @@ void GameProject::Update(float dt) {
 		for (auto gameObjectY = std::next(gameObjectX);
 			 gameObjectY != this->gameObjects.end(); ++gameObjectY) {
 			if (!gameObjectY->second->CheckTag("Physics")) {
-				continue;
-			}
-			if (gameObjectX->second == gameObjectY->second ||
-				!(gameObjectY->second->CheckTag("Fixed") ||
-				  gameObjectX->second->CheckTag("Fixed"))) {
 				continue;
 			}
 			if (CheckCollision(reinterpret_cast<PhysicsObject *>(
@@ -105,6 +117,20 @@ void GameProject::Update(float dt) {
 		this->events[event]->Process(this, dt);
 	}
 	eventList.clear();
+	for (auto &[zindex, key] :
+		 std::ranges::reverse_view(this->zIndexQueue)) {
+		this->gameObjects[key]->Update(dt);
+	}
+	for (auto it = zIndexQueue.begin(); it != zIndexQueue.end();
+		 ++it) {
+		auto key = it->second;
+		if (this->gameObjects[key]->CheckTag("Deleted")) {
+			spdlog::debug("Deleted Object '{}'", key);
+			delete this->gameObjects[key];
+			gameObjects.erase(key);
+			it = --zIndexQueue.erase(it);
+		}
+	}
 }
 
 void GameProject::Render() {
@@ -143,6 +169,9 @@ auto createNewGameObject(YAML::Node &object) -> GameObject * {
 	}
 	else if (object["type"].as<std::string>() == "rigidObject") {
 		gameObject = new RigidObject;
+	}
+	else if (object["type"].as<std::string>() == "bulletObject") {
+		gameObject = new BulletObject;
 	}
 	else {
 		gameObject = new GameObject;
@@ -202,3 +231,16 @@ void GameProject::ChangeState(GameState newState) {
 
 	spdlog::info("State change done.");
 }
+
+void GameProject::AddObject(std::string name, void *obj) {
+	spdlog::debug("Added Object '{}'", name);
+	gameObjects[name] = reinterpret_cast<GameObject *>(obj);
+	this->zIndexQueue.emplace(0, name);
+}
+
+auto GameProject::GetWidth() -> void * { return &width; }
+auto GameProject::GetHeight() -> void * { return &height; }
+auto GameProject::GetGameObjects() -> void * { return &gameObjects; }
+auto GameProject::GetGameState() -> void * { return &gameState; }
+auto GameProject::GetEvents() -> void * { return &events; }
+auto GameProject::GetAdapter() -> void * { return &adapter; }

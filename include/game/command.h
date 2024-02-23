@@ -102,4 +102,17 @@ class CommandRigidFall : public Command {
 	}
 };
 
+class CommandRigidFire : public Command {
+  protected:
+	CommandRigidFire() = default;
+
+  public:
+	void Execute(GameObject *self, GameBase *game,
+				 float deltaTime) override;
+	static auto Instance() -> Command * {
+		static CommandRigidFire _instance;
+		return &_instance;
+	}
+};
+
 #endif

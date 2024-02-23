@@ -1,12 +1,22 @@
 #ifndef RIGID_OBJECT_H
 #define RIGID_OBJECT_H
 
+#include "game/gameObject.h"
 #include "game/physicsObject.h"
 
 class RigidObject : public PhysicsObject {
+  public:
+	enum Face { LEFT, RIGHT };
+
+  private:
+	Face facing;
+
   protected:
-	int jumpAble = 0;
 	float jumpColdDown = 0;
+	int jumpAble = 0;
+
+	float fireColdDown = 0;
+	float fireColdDownTime;
 
   public:
 	RigidObject() = default;
@@ -16,19 +26,22 @@ class RigidObject : public PhysicsObject {
 
 	void Update(float dt) override;
 
+	void OnCollision(PhysicsObject *obj) override;
+
 	void InsertObjectEvents(void *events) override;
 	void RemoveObjectEvents(void *events) override;
 
-	auto GetJumpAble() -> int & { return jumpAble; }
-	static auto GetJumpAbility() -> int;
-	auto ResetJumpAble() -> void { jumpAble = GetJumpAbility(); }
-	auto SubJumpAble() -> void { jumpAble > 0 ? --jumpAble : 0; }
+	void SetFacing(Face facing) { this->facing = facing; }
+	[[nodiscard]] auto GetFacing() const -> Face { return facing; }
 
-	auto GetJumpColdDown() -> float & { return jumpColdDown; }
-	static auto GetJumpColdDownTime() -> float;
-	auto ResetJumpColdDown() -> void {
-		jumpColdDown = GetJumpColdDownTime();
-	}
+	auto ResetJumpAble() -> void;
+	auto SubJumpAble() -> void;
+
+	auto GetJumpColdDown() -> float &;
+	auto ResetJumpColdDown() -> void;
+
+	auto GetFireColdDown() -> float &;
+	auto ResetFireColdDown() -> void;
 };
 
 #endif

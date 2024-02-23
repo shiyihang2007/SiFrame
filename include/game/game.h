@@ -31,8 +31,8 @@ class GameProject : public GameBase {
 	std::vector<std::string> eventList;
 
   public:
-	GameProject(int width, int height)
-		: width(width), height(height) {}
+	GameProject(int width, int height);
+	~GameProject() override;
 
 	void Init();
 
@@ -44,12 +44,14 @@ class GameProject : public GameBase {
 
 	void ChangeState(GameState newState) override;
 
-	auto GetWidth() -> void * override { return &width; }
-	auto GetHeight() -> void * override { return &height; }
-	auto GetGameObjects() -> void * override { return &gameObjects; }
-	auto GetGameState() -> void * override { return &gameState; }
-	auto GetEvents() -> void * override { return &events; }
-	auto GetAdapter() -> void * override { return &adapter; }
+	auto GetWidth() -> void * override;
+	auto GetHeight() -> void * override;
+	auto GetGameObjects() -> void * override;
+	auto GetGameState() -> void * override;
+	auto GetEvents() -> void * override;
+	auto GetAdapter() -> void * override;
+
+	void AddObject(std::string name, void *obj) override;
 };
 
 #endif

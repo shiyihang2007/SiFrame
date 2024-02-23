@@ -24,50 +24,30 @@ class PhysicsObject : public GameObject {
 
 	void Update(float dt) override;
 
-	[[nodiscard]] auto IsVirtual() const -> bool {
-		return virtualTime > 0.0F;
-	}
-
 	void InsertObjectEvents(void *events) override;
 	void RemoveObjectEvents(void *events) override;
 
 	virtual void AddForce(float x, float y);
-	void AddVirtualTime(float time) {
-		this->tags.insert("Virtual");
-		this->virtualTime += time;
-	}
+
+	void AddVirtualTime(float time);
 
 	[[nodiscard]] auto GetVelocity() const
-		-> std::pair<float, float> {
-		return {this->velocityX, this->velocityY};
-	}
-	[[nodiscard]] auto GetVelocityX() const -> float {
-		return this->velocityX;
-	}
-	[[nodiscard]] auto GetVelocityY() const -> float {
-		return this->velocityY;
-	}
-	virtual void SetVelocity(float x, float y) {
-		this->velocityX = x;
-		this->velocityY = y;
-	}
-	virtual void SetVelocity(std::pair<float, float> velocity) {
-		this->velocityX = velocity.first;
-		this->velocityY = velocity.second;
-	}
-	virtual void SetVelocityX(float x) { this->velocityX = x; }
-	virtual void SetVelocityY(float y) { this->velocityY = y; }
-	[[nodiscard]] auto GetMess() const -> float {
-		return this->mess;
-	}
-	void SetMess(float mess) { this->mess = mess; }
+		-> std::pair<float, float>;
+	[[nodiscard]] auto GetVelocityX() const -> float;
+	[[nodiscard]] auto GetVelocityY() const -> float;
 
-	void SetColliding(bool isColliding) {
-		this->isColliding = isColliding;
-	}
-	[[nodiscard]] auto IsColliding() const -> bool {
-		return this->isColliding;
-	}
+	virtual void SetVelocity(float x, float y);
+	virtual void SetVelocity(std::pair<float, float> velocity);
+	virtual void SetVelocityX(float x);
+	virtual void SetVelocityY(float y);
+
+	[[nodiscard]] auto GetMess() const -> float;
+	void SetMess(float mess);
+
+	void SetColliding(bool isColliding);
+	[[nodiscard]] auto IsColliding() const -> bool;
+
+	virtual void OnCollision(PhysicsObject *obj);
 
 	auto
 	CheckCollisionWith(std::map<std::string, GameObject *> *objects)

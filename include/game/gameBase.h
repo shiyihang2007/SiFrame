@@ -20,6 +20,8 @@ class GameBase {
 	virtual auto GetGameState() -> void * = 0;
 	virtual auto GetEvents() -> void * = 0;
 	virtual auto GetAdapter() -> void * = 0;
+
+	virtual void AddObject(std::string name, void *obj) = 0;
 };
 
 #endif

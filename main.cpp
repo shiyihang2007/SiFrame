@@ -10,6 +10,7 @@
 
 #include <cstring>
 #include <fstream>
+#include <random>
 
 // GLFW function declerations
 void keyCallback(GLFWwindow *window, int key, int scancode,
@@ -27,6 +28,7 @@ std::string WINDOW_TITLE;
 GameProject *game;
 
 YAML::Node config;
+std::mt19937 rnd(std::random_device{}());
 
 void LoadConfig(const char *configFilename) {
 	std::ifstream configFile(configFilename);

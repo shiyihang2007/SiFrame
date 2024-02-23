@@ -97,9 +97,8 @@ void CommandRigidFire::Execute(GameObject *self, GameBase *game,
 			self->GetWidth() */);
 	bullet->SetPosY(self->GetPosY() + self->GetHeight() / 2 -
 					bullet->GetHeight() / 2);
-	bullet->SetRotation(rigid->GetFacing() == RigidObject::LEFT
-							? std::numbers::pi
-							: 0.0F);
+	bullet->SetRotation(
+		rigid->GetFacing() == RigidObject::LEFT ? 180.0F : 0.0F);
 	bullet->SetOwner(self);
 	bullet->ResetLifeTime();
 	game->AddObject(
@@ -110,8 +109,8 @@ void CommandRigidFire::Execute(GameObject *self, GameBase *game,
 		bullet);
 	rigid->AddForce(
 		(rigid->GetFacing() == RigidObject::LEFT
-			 ? 0.3 * config["physics"]["pixelsPerMeter"].as<float>()
-			 : -0.3 *
+			 ? 0.2F * config["physics"]["pixelsPerMeter"].as<float>()
+			 : -0.2F *
 				   config["physics"]["pixelsPerMeter"].as<float>()) /
 			rigid->GetMess(),
 		-0.1F * config["physics"]["pixelsPerMeter"].as<float>());

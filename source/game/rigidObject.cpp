@@ -125,7 +125,11 @@ void RigidObject::RemoveObjectEvents(void *eventsV) {
 void RigidObject::OnCollision(PhysicsObject *obj) {
 	if (obj->CheckTag("Fixed")) {
 		if (this->CheckTag("Fall") || this->velocityY <= 0.0F ||
-			this->posy + this->height / 2 >= obj->GetPosY()) {
+			this->posy + this->height / 2 >= obj->GetPosY() ||
+			(this->posy + this->height / 4 * 3 >= obj->GetPosY() &&
+			 this->velocityY <=
+				 1.0F * config["physics"]["pixelsPerMeter"]
+							.as<float>())) {
 			return;
 		}
 		this->velocityY = 0.0F;

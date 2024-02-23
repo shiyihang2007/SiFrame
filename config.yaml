@@ -116,7 +116,34 @@ states:
       - name: plate3
         spriteId: PlateSprite
         posx: 250
-        posy: 375
+        posy: 390
+        width: 250
+        height: 25
+        type: physicsFixedObject
+        mess: 100
+        zindex: -10
+      - name: plate4
+        spriteId: PlateSprite
+        posx: 300
+        posy: 250
+        width: 170
+        height: 25
+        type: physicsFixedObject
+        mess: 100
+        zindex: -10
+      - name: plate5
+        spriteId: PlateSprite
+        posx: 450
+        posy: 325
+        width: 250
+        height: 25
+        type: physicsFixedObject
+        mess: 100
+        zindex: -10
+      - name: plate6
+        spriteId: PlateSprite
+        posx: 100
+        posy: 325
         width: 250
         height: 25
         type: physicsFixedObject
